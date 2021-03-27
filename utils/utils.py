@@ -115,19 +115,25 @@ def download_image(illust):
     # 图片保存目录
     base_path = make_dir(member_name, illust.member_id)
     for i in range(page_count):
-        save_name = str(bookmark_count) + "_" + filter_name(
-            illust_title) + '_' + str(i) + ext_name
+        save_name = str(bookmark_count) + "_" + \
+            filter_name(illust_title) + '_' + str(i) + ext_name
         save_path = os.path.join(base_path, save_name)
         r = requests.get(re.sub(r'_p(\d)', '_p' + str(i),
                                 original_image), headers=headers)
-        image_size = int(r.headers['Content-Length'], 0)
-        logger.info("Start download illustration...")
-        with open(save_path, 'wb') as file, tqdm(desc=illust_title+'_'+str(i), total=image_size, unit='B', unit_scale=True, unit_divisor=1024) as bar:
-            for data in r.iter_content(chunk_size=1024):
-                size = file.write(data)
-                bar.update(size)
-        logger.success("Download illustration " +
-                       filter_name(illust_title) + " complete! Saved in " + base_path)
+        if r.headers.get('Content-Length'):
+            image_size = int(r.headers['Content-Length'], 0)
+            logger.info("Start download illustration...")
+            with open(save_path, 'wb') as file, tqdm(desc=illust_title+'_'+str(i), total=image_size, unit='B', unit_scale=True, unit_divisor=1024) as bar:
+                for data in r.iter_content(chunk_size=1024):
+                    size = file.write(data)
+                    bar.update(size)
+            logger.success("Download illustration " + filter_name(illust_title) +'_'+str(i) + " complete! Saved in " + base_path)
+        else:
+            logger.warn("Transfer-Encoding: Chunked")
+            with open(save_path, 'wb') as file:
+                file.write(r.content)
+            logger.success("Download illustration " + filter_name(illust_title) +
+                           '_'+str(i) + " complete! Saved in " + base_path)
     logger.info("Download complete")
     return save_path
 
