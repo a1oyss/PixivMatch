@@ -88,7 +88,8 @@ def download_image(illust):
     :return: 下载成功返回图片路径，失败返回None
     """
     headers = {
-        'Referer': 'https://www.pixiv.net/'
+        'Referer': 'https://www.pixiv.net/',
+        'Accept-Encoding': None
     }
     r = requests.get(illust.illust_url)
     # print(r.encoding)
