@@ -2,4 +2,4 @@
 resources/
 venv/
 __pycache__
-results.csv
+*.csv
