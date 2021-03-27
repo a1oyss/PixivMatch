@@ -88,8 +88,7 @@ def download_image(illust):
     :return: 下载成功返回图片路径，失败返回None
     """
     headers = {
-        'Referer': 'https://www.pixiv.net/',
-        'Accept-Encoding': None
+        'Referer': 'https://www.pixiv.net/'
     }
     r = requests.get(illust.illust_url)
     # print(r.encoding)
@@ -120,7 +119,7 @@ def download_image(illust):
             illust_title) + '_' + str(i) + ext_name
         save_path = os.path.join(base_path, save_name)
         r = requests.get(re.sub(r'_p(\d)', '_p' + str(i),
-                                original_image), headers=headers, stream=True)
+                                original_image), headers=headers)
         image_size = int(r.headers['Content-Length'], 0)
         logger.info("Start download illustration...")
         with open(save_path, 'wb') as file, tqdm(desc=illust_title+'_'+str(i), total=image_size, unit='B', unit_scale=True, unit_divisor=1024) as bar:
