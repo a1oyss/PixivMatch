@@ -11,8 +11,7 @@ import os
 
 class Saucenao(object):
     def __init__(self):
-        """
-        初始化Saucenao配置
+        """初始化配置
         """
         config = utils.read_config()
         self.api_key = config.api_key
@@ -20,17 +19,32 @@ class Saucenao(object):
         self.db_bitmask = config.db_bitmask
 
     def search_by_api(self, filename):
-        """
-        使用Saucenao api搜索图片
+        """使用API搜索
 
-        :param filename: 图片路径
-        :return: 返回Illust对象，未找到返回0
-        :raises ServiceError 服务器错误
-        :raises APIError API错误
-        :raises RequestError 请求参数错误
-        :raises IndexError 图库配置错误
-        :raises OutOfSearch 超出每日可查询数
-        :raises TooQuick 查询过快
+        Parameters
+        ----------
+        filename : str
+            图片路径
+
+        Returns
+        -------
+        Illust
+            Illust对象
+
+        Raises
+        ------
+        ServiceError
+            服务器错误
+        APIError
+            API配置错误
+        RequestError
+            请求错误
+        IndexError
+            Index配置错误
+        OutOfSearch
+            超出查询次数
+        TooQuick
+            查询过快
         """
         image_data = utils.image_read(filename=filename)
         url = 'http://saucenao.com/search.php?output_type=2&numres=1&minsim=' + \
@@ -109,12 +123,17 @@ class Saucenao(object):
         return Illust(similarity, illust_url[0], illust_title, illust_id, member_name, member_id)
 
     def search_by_normal(self, filename):
-        """
-        不使用API查询
+        """不使用API查询
 
-        :param filename: 图片路径
-        :return: 返回Illust对象，未找到返回0
-        :raises OutOfSearch 超出每日可查询数
+        Parameters
+        ----------
+        filename : str
+            文件名
+
+        Returns
+        -------
+        Illust
+            成功返回Illust对象，失败返回None
         """
         image_data = utils.image_read(filename)
         url = 'https://saucenao.com/search.php'
