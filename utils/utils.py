@@ -1,5 +1,7 @@
 from configparser import ConfigParser
 from operator import itemgetter
+import cv2
+import numpy as np
 from bean.illust import Illust
 from PIL import Image
 from bean.config import Config
@@ -7,6 +9,8 @@ from bs4 import BeautifulSoup
 from utils import logger
 from html import unescape
 from tqdm import tqdm
+from utils import similarity
+import matplotlib.pyplot as plt
 import hashlib
 import os
 import io
@@ -81,7 +85,7 @@ def parse_content(content):
                   results['member_id'], results['member_name'])
 
 
-def download_image(illust):
+def download_image(illust, original):
     """
     下载图片
     :param illust: Illust对象
@@ -114,6 +118,7 @@ def download_image(illust):
     illust_title = content['illust'][illust.illust_id]['illustTitle']
     # 图片保存目录
     base_path = make_dir(member_name, illust.member_id)
+    download_list = []
     for i in range(page_count):
         save_name = str(bookmark_count) + "_" + \
             filter_name(illust_title) + '_' + str(i) + ext_name
@@ -127,15 +132,19 @@ def download_image(illust):
                 for data in r.iter_content(chunk_size=1024):
                     size = file.write(data)
                     bar.update(size)
-            logger.success("Download illustration " + filter_name(illust_title) +'_'+str(i) + " complete! Saved in " + base_path)
+            logger.success("Download illustration " + filter_name(illust_title) +
+                           '_'+str(i) + " complete! Saved in " + base_path)
+            download_list.append(save_path)
         else:
             logger.warn("Transfer-Encoding: Chunked")
             with open(save_path, 'wb') as file:
                 file.write(r.content)
             logger.success("Download illustration " + filter_name(illust_title) +
                            '_'+str(i) + " complete! Saved in " + base_path)
-    logger.info("Download complete")
-    return save_path
+            download_list.append(save_path)
+    logger.info("Download complete,compare image...")
+    is_same = compare(download_list, original, True)
+    return is_same
 
 
 def make_dir(author, author_id):
@@ -206,14 +215,51 @@ def verify(value):
     with open('results.csv', 'r') as f:
         r_csv = csv.DictReader(f)
         for row in r_csv:
-            if row['hash'] == value:
+            if row['pid'] == value:
                 return False
     return True
 
 
 def is_image(filename):
+    """
+    检测文件是否是图片
+    :param filename: 文件名
+    :return: 
+    """
     extensions = ["jpg", "jpeg", "png", "gif", "bmp", "jfif"]
     ext = filename.split('.')[-1]
     if ext in extensions:
         return True
     return False
+
+
+def compare(path_list, original_path, show=False):
+    illust_compare = similarity.ImageCompare()
+    flag = False
+    if show:
+        plt.ion()
+        original = cv2.imdecode(np.fromfile(
+            original_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+        original = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
+        plt.subplot(1, 2, 1).set_title('original')
+        plt.imshow(original)
+        for file in path_list:
+            image = cv2.imdecode(np.fromfile(
+                file, dtype=np.uint8), cv2.IMREAD_COLOR)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            plt.subplot(1, 2, 2).set_title('diff')
+            plt.tight_layout()
+            plt.imshow(image)
+            if illust_compare.dHash_compare(original_path, file) > 90:
+                flag = True
+            plt.show()
+            plt.pause(2)
+            plt.cla()
+    else:
+        for file in path_list:
+            if illust_compare.dHash_compare(original_path, file) > 90:
+                flag = True
+    if flag:
+        return True
+    else:
+        return False
