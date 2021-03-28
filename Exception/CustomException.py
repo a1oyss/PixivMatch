@@ -24,3 +24,6 @@ class OutOfSearch(Exception):
 
 class TooQuick(Exception):
     pass
+
+class NotSame(Exception):
+    pass
