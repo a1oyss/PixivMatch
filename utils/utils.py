@@ -1,3 +1,4 @@
+from Exception.CustomException import NotSame
 from configparser import ConfigParser
 from operator import itemgetter
 import cv2
@@ -143,7 +144,9 @@ def download_image(illust, original):
                            '_'+str(i) + " complete! Saved in " + base_path)
             download_list.append(save_path)
     logger.info("Download complete,compare image...")
-    is_same = compare(download_list, original, True)
+    is_same = compare(download_list, original, False)
+    if not is_same:
+        raise NotSame
     return is_same
 
 
