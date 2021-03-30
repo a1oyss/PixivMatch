@@ -1,4 +1,6 @@
 import time
+
+from bs4 import BeautifulSoup
 from bean.illust import Illust
 from utils import utils
 from utils import logger
@@ -142,18 +144,30 @@ class Saucenao(object):
         session.keep_alive = False
         while True:
             try:
-                r = session.post(url=url, files=files)
+                r = session.post(url=url, files=files,timeout=5)
             except:
                 logger.warn("Connection failed,retrying after 5s...")
                 time.sleep(5)
                 continue
-            if "Limit" in r.text:
-                logger.error("You have reached the daily limit,Change IP and press Enter to continue")
+            # if "Limit" in r.text:
+            #     logger.error("You have reached the daily limit,Change IP and press Enter to continue")
+            #     os.system('pause')
+            #     continue
+            # if "try again later" in r.text:
+            #     logger.warn("Too many failed search attempts, try again later")
+            #     time.sleep(10)
+            #     continue
+            if r.status_code!=200:
+                soup=BeautifulSoup(r.content,'html5lib')
+                logger.error(soup.getText())
                 os.system('pause')
                 continue
             illust = utils.parse_content(r.content)
             if not illust:
                 logger.fail("No results...")
+                # logger.debug(r.text)
+                r.close()
                 return None
             logger.success("Hit! " + illust.similarity)
+            r.close()
             return illust
