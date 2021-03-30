@@ -29,15 +29,18 @@ for root, dirs, files in os.walk(find_path):
                 continue
             if not utils.verify(illust.illust_id):
                 logger.warn("The illustration have been searched")
+                shutil.move(filename, os.path.join(root, 'Backups'))
                 continue
             if Decimal(illust.similarity) > 80:
-                download_results = utils.download_image(illust, filename)
+                try:
+                    download_results = utils.download_image(illust, filename)
+                except:
+                    logger.error("Illustration doesn't match")
                 if download_results:
                     utils.write_to_csv(illust.illust_id)
                     shutil.move(filename, os.path.join(root, 'Backups'))
                 else:
                     shutil.move(filename, os.path.join(root, 'Invalid'))
-                    raise NotSame
             else:
                 logger.fail("Similarity is too low,skip this illustration")
                 shutil.move(filename, os.path.join(root, 'NotFound'))
