@@ -1,5 +1,4 @@
 .vscode/
-resources/
 venv/
 __pycache__
 *.csv
