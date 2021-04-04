@@ -1,5 +1,10 @@
 .vscode/
 venv/
 __pycache__
-*.csv
 test/
+*.png
+*.jpg
+*.jfif
+*.jpeg
+*.gif
+*.bmp
