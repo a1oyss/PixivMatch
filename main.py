@@ -27,7 +27,7 @@ for root, dirs, files in os.walk(find_path):
             if not illust:
                 shutil.move(filename, os.path.join(root, 'NotFound'))
                 continue
-            if not utils.verify(illust.illust_id):
+            if not utils.verify(illust.illust_id,illust.illust_title):
                 logger.warn("The illustration have been searched")
                 shutil.move(filename, os.path.join(root, 'Backups'))
                 continue
@@ -37,7 +37,7 @@ for root, dirs, files in os.walk(find_path):
                 except:
                     logger.error("Illustration doesn't match")
                 if download_results:
-                    utils.write_to_csv(illust.illust_id)
+                    utils.write_to_redis(illust.illust_id,illust.illust_title)
                     shutil.move(filename, os.path.join(root, 'Backups'))
                 else:
                     shutil.move(filename, os.path.join(root, 'Invalid'))
