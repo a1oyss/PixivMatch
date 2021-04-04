@@ -1,6 +1,8 @@
+import redis
 from Exception.CustomException import NotSame
 from configparser import ConfigParser
 from operator import itemgetter
+from utils import redisConn
 import cv2
 import numpy as np
 from bean.illust import Illust
@@ -190,37 +192,31 @@ def get_hash(filename):
     """
     _hash = hashlib.md5()
     with open(filename, 'rb') as file:
-        while True:
-            data = file.read(1024)
-            if not data:
-                break
-            _hash.update(data)
+        _hash.update(file.read())
     return _hash.hexdigest()
 
 
-def write_to_csv(value):
+def write_to_redis(pid,title):
     """
-    将文件hash值写入csv文件
-    :param value: 要写入的hash值
+    将pid写入csv文件
+    :param value: 要写入的pid
     :return: None
     """
-    with open("results.csv", 'a+', newline='') as file:
-        f_csv = csv.writer(file)
-        f_csv.writerow([value])
+    r=redisConn.Redis()
+    r.hset('setu:pixiv', pid, title)
 
 
-def verify(value):
+def verify(pid,title):
     """
-    验证hash值是否存在（是否搜索过）
-    :param value:
-    :return:
+    验证下载图片是否相同
+    :param pid:
+    :return: 不存在返回True，否则返回False
     """
-    with open('results.csv', 'r') as f:
-        r_csv = csv.DictReader(f)
-        for row in r_csv:
-            if row['pid'] == value:
-                return False
-    return True
+    r=redisConn.Redis()
+    if r.hexists('setu:pixiv', pid):
+        if r.hget('setu:pixiv', pid) == title:
+            return False
+    return True 
 
 
 def is_image(filename):
