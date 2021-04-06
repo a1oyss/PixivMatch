@@ -28,7 +28,7 @@ for root, dirs, files in os.walk(find_path):
                 shutil.move(filename, os.path.join(root, 'NotFound'))
                 continue
             if not utils.verify(illust.illust_id,illust.illust_title):
-                logger.warn("The illustration have been searched")
+                logger.warn("The illustration "+illust.illust_title+" have been searched")
                 shutil.move(filename, os.path.join(root, 'Backups'))
                 continue
             if Decimal(illust.similarity) > 80:
