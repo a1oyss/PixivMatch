@@ -214,8 +214,7 @@ def verify(pid,title):
     """
     r=redisConn.Redis()
     if r.hexists('setu:pixiv', pid):
-        if r.hget('setu:pixiv', pid) == title:
-            return False
+        return False
     return True 
 
 
