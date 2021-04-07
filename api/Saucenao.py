@@ -1,3 +1,4 @@
+import sys
 import time
 
 from bs4 import BeautifulSoup
@@ -161,8 +162,7 @@ class Saucenao(object):
             if r.status_code!=200:
                 soup=BeautifulSoup(r.content,'html5lib')
                 logger.error(soup.getText())
-                os.system('pause')
-                continue
+                sys.exit(0)
             illust = utils.parse_content(r.content)
             if not illust:
                 logger.fail("No results...")
