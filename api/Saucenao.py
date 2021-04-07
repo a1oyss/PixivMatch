@@ -145,7 +145,8 @@ class Saucenao(object):
         while True:
             try:
                 r = session.post(url=url, files=files,timeout=5)
-            except:
+            except Exception as e:
+                logger.error(e)
                 logger.warn("Connection failed,retrying after 5s...")
                 time.sleep(5)
                 continue
