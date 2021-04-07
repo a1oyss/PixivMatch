@@ -1,6 +1,8 @@
 # Setu
 识别图se片tu，通过Saucenao搜索图片来源，并下载pixiv的原图，放入对应文件夹中
-需要安装Redis
+
+为了防止重复下载，需要安装Redis存储pixiv id
+
 文件夹和图片命名规则：
 ```
 作者pixiv id_作者名称             (文件夹)
