@@ -1,5 +1,5 @@
-# Setu
-识别图se片tu，通过Saucenao搜索图片来源，并下载pixiv的原图，放入对应文件夹中
+# PixivMatch
+识别图片，通过Saucenao搜索图片来源，并下载pixiv的原图，放入对应文件夹中
 
 为了防止重复下载，需要安装Redis存储pixiv id
 
